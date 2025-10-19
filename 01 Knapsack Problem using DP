@@ -1,0 +1,38 @@
+#include <iostream>
+using namespace std;
+int max(int a, int b) {
+ return (a > b) ? a : b;
+}
+int main() {
+ int n, W;
+ cout << "Enter number of items: ";
+ cin >> n;
+ cout << "Enter capacity of knapsack: ";
+ cin >> W;
+ int weight[100], profit[100];
+ for (int i = 1; i <= n; i++) {
+ cout << "Enter profit and weight of item " << i << ": ";
+ cin >> profit[i] >> weight[i];
+ }
+ int dp[n + 1][W + 1];
+ for (int i = 0; i <= n; i++) {
+ for (int w = 0; w <= W; w++) {
+ if (i == 0 || w == 0)
+ dp[i][w] = 0;
+ else if (weight[i] <= w)
+ dp[i][w] = max(profit[i] + dp[i - 1][w - weight[i]], dp[i - 1][w]);
+ else
+ dp[i][w] = dp[i - 1][w];
+ }
+ }
+ cout << "\nMaximum Profit = " << dp[n][W] << endl;
+ int w = W;
+ cout << "Items selected:\n";
+ for (int i = n; i > 0 && w > 0; i--) {
+ if (dp[i][w] != dp[i - 1][w]) {
+ cout << "Item " << i << endl;
+ w -= weight[i];
+ }
+ }
+ return 0;
+}
