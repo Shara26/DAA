@@ -1,0 +1,51 @@
+Fractional Knapsack Problem using a greedy approach.
+
+#include <iostream>
+#include <algorithm>
+using namespace std;
+struct Item {
+ int id;
+ int weight;
+ int profit;
+ double ratio;
+};
+bool cmp(Item a, Item b) {
+ return a.ratio > b.ratio;}
+int main() {
+ int n, capacity;
+ cout << "Enter number of items: ";
+ cin >> n;
+ cout << "Enter capacity of knapsack: ";
+ cin >> capacity;
+ Item items[100];
+ double fraction[100] = {0};
+ for (int i = 0; i < n; i++) {
+ cout << "Enter profit and weight of item " << i + 1 << ": ";
+ cin >> items[i].profit >> items[i].weight;
+ items[i].id = i + 1;
+ items[i].ratio = (double)items[i].profit / items[i].weight; }
+ sort(items, items + n, cmp);
+ double totalProfit = 0.0;
+ int remaining = capacity;
+ for (int i = 0; i < n && remaining > 0; i++) {
+ if (items[i].weight <= remaining) {
+ remaining -= items[i].weight;
+ totalProfit += items[i].profit;
+ fraction[i] = 1.0;
+ } else {
+ fraction[i] = (double)remaining / items[i].weight;
+ totalProfit += items[i].profit * fraction[i];
+ remaining = 0; }
+ }
+ cout << "\nItems selected for maximum profit:\n";
+ for (int i = 0; i < n; i++) {
+ if (fraction[i] > 0) {
+ cout << "Item " << items[i].id << endl; }
+ }
+ cout << "\nMaximum Profit = " << totalProfit << endl;
+ return 0;
+}
+
+
+
+
