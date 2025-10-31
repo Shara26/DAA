@@ -1,0 +1,145 @@
+#include <iostream> 
+using namespace std; 
+#define MAX 10 
+#define INF 9999 
+ 
+void copyMatrix(int src[MAX][MAX], int dest[MAX][MAX], int n) 
+{ 
+for (int i = 0; i < n; i++) 
+for (int j = 0; j < n; j++) 
+dest[i][j] = src[i][j]; 
+} 
+ 
+int reduceMatrix(int cost[MAX][MAX], int n) 
+{ 
+int reduction = 0, minRow, minCol; 
+for (int i = 0; i < n; i++) 
+{ 
+minRow = INF; 
+for (int j = 0; j < n; j++) 
+if (cost[i][j] < minRow) 
+minRow = cost[i][j]; 
+if (minRow != INF && minRow != 0) 
+{ 
+reduction += minRow; 
+for (int j = 0; j < n; j++) 
+if (cost[i][j] != INF) 
+cost[i][j] -= minRow; 
+} 
+} 
+for (int j = 0; j < n; j++) 
+{ 
+minCol = INF; 
+for (int i = 0; i < n; i++) 
+if (cost[i][j] < minCol) 
+minCol = cost[i][j]; 
+if (minCol != INF && minCol != 0) 
+{ 
+reduction += minCol; 
+for (int i = 0; i < n; i++) 
+if (cost[i][j] != INF) 
+cost[i][j] -= minCol; 
+} 
+} 
+return reduction; 
+} 
+struct Node 
+{ 
+int matrix[MAX][MAX]; 
+int path[MAX]; 
+int level; int 
+vertex; int 
+cost; 
+}; 
+void createNode(Node &child, Node parent, int i, int j, int n) 
+{ 
+copyMatrix(parent.matrix, child.matrix, n); for 
+(int k = 0; k < n; k++) 
+{ 
+child.matrix[i][k] = INF; 
+child.matrix[k][j] = INF; 
+} 
+child.matrix[j][0] = INF; 
+for (int k = 0; k <= parent.level; k++) 
+child.path[k] = parent.path[k]; 
+child.path[parent.level + 1] = j; 
+child.level = parent.level + 1; 
+child.vertex = j; 
+} 
+void solveTSP(int costMatrix[MAX][MAX], int n) 
+{ 
+Node live[100]; 
+int front = 0, rear = 0; 
+Node root; 
+copyMatrix(costMatrix, root.matrix, n); 
+root.level = 0; 
+root.vertex = 0; 
+root.path[0] = 0; 
+root.cost = reduceMatrix(root.matrix, n); 
+live[rear++] = root; 
+int minCost = INF; 
+int bestPath[MAX]; 
+while (front < rear) 
+{ 
+int minIndex = front; 
+for (int i = front + 1; i < rear; i++) 
+if (live[i].cost < live[minIndex].cost) 
+minIndex = i; 
+Node node = live[minIndex]; 
+live[minIndex] = live[front]; 
+front++; 
+if (node.level == n - 1) 
+{ 
+int last = node.vertex; 
+int finalCost = node.cost + costMatrix[last][0]; 
+if (finalCost < minCost) 
+{ 
+minCost = finalCost; 
+for (int i = 0; i <= n; i++) 
+bestPath[i] = node.path[i]; 
+bestPath[n] = 0; 
+} 
+continue; 
+} 
+for (int j = 0; j < n; j++) 
+{ 
+if (node.matrix[node.vertex][j] != INF) 
+{ 
+Node child; 
+createNode(child, node, node.vertex, j, n); 
+child.cost = node.cost + costMatrix[node.vertex][j] + 
+reduceMatrix(child.matrix, n); live[rear++] = child; 
+} 
+} 
+} 
+cout << "\nMinimum Cost: " << minCost; 
+cout << "\nPath: "; 
+for (int i = 0; i <= n; i++) 
+cout << bestPath[i] << " "; 
+cout << endl; 
+} 
+int main() 
+{ 
+int n; 
+int costMatrix[MAX][MAX]; 
+cout << "Enter number of cities: "; 
+cin >> n; 
+cout << "Enter cost matrix (use 999 for INF):\n"; 
+for (int i = 0; i < n; i++) 
+for (int j = 0; j < n; j++) 
+cin >> costMatrix[i][j]; 
+solveTSP(costMatrix, n); 
+return 0; 
+}
+/*  
+Enter number of cities: 4
+Enter cost matrix (use 999 for INF):
+999
+10 15 20
+10 999 35 25
+15 35 999 30
+20 25 30 999
+
+Minimum Cost: 160
+Path: 0 1 3 2 0
+*/
