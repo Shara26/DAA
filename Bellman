@@ -1,73 +1,75 @@
+
 #include <iostream>
-#include <climits>
+#include <limits>
 using namespace std;
+
+struct Edge {
+    int u, v, w;
+};
+
+void bellmanFord(int V, int E, int src, Edge edges[])
+{
+    int dist[100]; 
+    for (int i = 0; i < V; i++)
+        dist[i] = numeric_limits<int>::max();
+    dist[src] = 0;
+
+    for (int i = 1; i <= V - 1; i++)
+    {
+        for (int j = 0; j < E; j++)
+        {
+            int u = edges[j].u;
+            int v = edges[j].v;
+            int w = edges[j].w;
+            if (dist[u] != numeric_limits<int>::max() && dist[u] + w < dist[v])
+                dist[v] = dist[u] + w;
+        }
+    }
+
+    for (int j = 0; j < E; j++)
+    {
+        int u = edges[j].u;
+        int v = edges[j].v;
+        int w = edges[j].w;
+        if (dist[u] != numeric_limits<int>::max() && dist[u] + w < dist[v])
+        {
+            cout << "Graph contains negative weight cycle!" << endl;
+            return;
+        }
+    }
+
+    cout << "\nVertex\tDistance from Source\n";
+    for (int i = 0; i < V; i++)
+    {
+        if (dist[i] == numeric_limits<int>::max())
+            cout << i << "\tINF\n";
+        else
+            cout << i << "\t" << dist[i] << "\n";
+    }
+}
 
 int main()
 {
- int V, E;
-cout << "Enter number of vertices: ";
-cin >> V;
-cout << "Enter number of edges: ";
-cin >> E;
+    int V, E, src;
+    cout << "Enter number of vertices: ";
+    cin >> V;
+    cout << "Enter number of edges: ";
+    cin >> E;
 
- int u[100], v[100], w[100];
-for (int i = 0; i < E; i++)
-{
- cout << "Edge " << i + 1 << " (u v w): ";
-  cin >> u[i] >> v[i] >> w[i];
- }
+    Edge edges[100];
 
-int source;
- cout << "Enter source vertex: ";
- cin >> source;
+    cout << "Enter edges (u v w):\n";
+    for (int i = 0; i < E; i++)
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
 
-int dist[100];
+    cout << "Enter source vertex (0 to " << V - 1 << "): ";
+    cin >> src;
 
- for (int i = 0; i < V; i++)
-  dist[i] = INT_MAX;
- dist[source] = 0;
- 
- for (int i = 1; i <= V - 1; i++)
-{
- for (int j = 0; j < E; j++)
- {
- if (dist[u[j]] + w[j] < dist[v[j]])
- {
-dist[v[j]] = dist[u[j]] + w[j];
- }
- }
- }
+    bellmanFord(V, E, src, edges);
 
-bool hasCycle = false;
- for (int j = 0; j < E; j++)
- {
- if (dist[u[j]] != INT_MAX && dist[u[j]] + w[j] < dist[v[j]])
-{
-hasCycle = true;
- break;
- }
- }
-
- if (hasCycle)
- {
-  cout << "Graph contains a negative weight cycle.\n";
-  
- }
-else
-{
- cout << "Graph does not contain any negative weight cycle.\n";
- cout << "Shortest distances from source " << source << ":\n";
-  for (int i = 0; i < V; i++)
- {
- cout << "Vertex " << i << "-> ";
- if (dist[i] == INT_MAX)
-cout << "Unreachable\n";
- else
-cout << dist[i] << "\n";
-   }
-return 0;
+    return 0;
 }
-}
+
 
 /*
 student@student:~$ g++ bellman.cpp
