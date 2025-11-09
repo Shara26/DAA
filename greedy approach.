@@ -1,84 +1,63 @@
-Fractional Knapsack Problem using a greedy approach.
 
 #include <iostream>
 using namespace std;
 
-int n;
-int ncap;
-int currWt = 0;
-float currPr = 0;
-
-float val[50];
-float wt[50];
-float r[50];
-
-void Sorting(int k, float arr[50], float arr2[50], float arr3[50]) {
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < k - i - 1; j++) {
-            if (arr[j] < arr[j + 1]) {
-                swap(arr[j], arr[j + 1]);
-                swap(arr2[j], arr2[j + 1]);
-                swap(arr3[j], arr3[j + 1]);
-            }
+int maximum(float a[], int n) {
+    int maxIndex = 0;  // Index of the maximum value in the ratio array
+    for (int i = 1; i < n; i++) {
+        if (a[i] > a[maxIndex]) {
+            maxIndex = i;
         }
     }
-}
-
-void knapSack() {
-    for (int i = 0; i < n; i++) {
-        if (currWt + wt[i] <= ncap) {
-            currWt += wt[i];
-            currPr += val[i];
-        } else {
-            int remain = ncap - currWt;
-            currPr += r[i] * remain;
-            currWt = ncap;
-            break;
-        }
-    }
-    cout << "\nTotal Profit: " << currPr << endl;
+    return maxIndex;
 }
 
 int main() {
-    cout << "\nEnter number of items: ";
+    int n = 0;
+    cout << "Enter the number of items that you want to enter: ";
     cin >> n;
 
-    cout << "\nEnter Values: ";
+    float capacity;
+    cout << "Enter the maximum capacity of the bag: ";
+    cin >> capacity;
+
+    float profit[n], weight[n];
+    cout << "Enter the profit and weight for each item:\nNOTE: Enter the profit first and then the weight:\n";
+
     for (int i = 0; i < n; i++) {
-        cout << "\nValue " << i + 1 << ": ";
-        cin >> val[i];
+        cin >> profit[i] >> weight[i];
     }
 
-    cout << "\nEnter Weights: ";
+    float ratio[n];
     for (int i = 0; i < n; i++) {
-        cout << "\nWeight " << i + 1 << ": ";
-        cin >> wt[i];
+        ratio[i] = profit[i] / weight[i];
     }
 
-    cout << "\nEnter Knapsack Capacity: ";
-    cin >> ncap;
-
-  
+    float output[n] = {0};
+    float p = 0;
+    
+    // Process items by highest ratio
     for (int i = 0; i < n; i++) {
-        r[i] = (float)val[i] / wt[i];
+        int max = maximum(ratio, n);
+        if (weight[max] <= capacity) {
+            capacity -= weight[max];
+            p += profit[max];
+            output[max] = 1;
+        } else {
+            float factor = capacity / weight[max];
+            p += profit[max] * factor;
+            output[max] = factor;
+            capacity = 0;
+        }
+        ratio[max] = -1;  // Mark this item as processed
     }
 
-   
-    Sorting(n, r, wt, val);
-
-    cout << "\nRatios:\t";
-    for (int i = 0; i < n; i++)
-        cout << "\t" << r[i];
-
-    cout << "\nValues:\t";
-    for (int i = 0; i < n; i++)
-        cout << "\t" << val[i];
-
-    cout << "\nWeights:\t";
-    for (int i = 0; i < n; i++)
-        cout << "\t" << wt[i];
-
-    knapSack();
+    cout << "Output array is:\n";
+    for (int i = 0; i < n; i++) {
+        cout << output[i] << " ";
+    }
+    cout << "\n";
+    cout << "Max profit is " << p << endl;
 
     return 0;
 }
