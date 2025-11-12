@@ -1,0 +1,43 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of items: ";
+    cin >> n;
+
+    float weight[10], profit[10], ratio[10];
+
+    cout << "Enter profit and weight of each item:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> profit[i] >> weight[i];
+        ratio[i] = profit[i] / weight[i];
+    }
+
+    float capacity;
+    cout << "Enter bag capacity: ";
+    cin >> capacity;
+
+    float maxProfit = 0;
+
+    while (capacity > 0) {
+        int max = 0;
+        for (int i = 1; i < n; i++) {
+            if (ratio[i] > ratio[max])
+                max = i;
+        }
+
+        if (weight[max] <= capacity) {
+            maxProfit += profit[max];
+            capacity -= weight[max];
+        } else {
+            maxProfit += ratio[max] * capacity;
+            capacity = 0;
+        }
+
+        ratio[max] = -1; // mark as used
+    }
+
+    cout << "\nMaximum Profit = " << maxProfit;
+    return 0;
+}
